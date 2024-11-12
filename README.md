@@ -91,11 +91,33 @@ Challenges and Design choices:
 * Load Balancing Schema: Chose a round-robin with sticky sessions to ensure subsequent requests from the same client are directed to the same web server.
 * Sticky Sessions: Ensured Nginx maintains session persistence so clients are routed to the same web server unless it's down.
 * X-Real-IP Header: Ensured the original IP is passed along to the web servers for logging or any IP-based configuration.
-* However, due to port range 60000-65000 on the load balancer, as existing worker connection was not enough for listening sockets and because of that resource limit was hit. Overcome this issue with modyfying system config.
+* However, due to port range 60000-65000 on the load balancer, as existing worker connection was not enough for listening sockets and because of that resource limit was hit. Overcome this issue by modifying the system config.
+  Err: nginx: [emerg] 768 worker_connections are not enough for 5002 listening sockets
+In case you also hit the similar issue, you can proceed with below steps(Keep in mind other OS performance tuning might be required per your setup).
+
+* Increase the worker_connection value(look for worker_connection directive inside event block).
+
+		sudo vi /etc/nginx/nginx.conf
+* Increasing worker_rlimit_nofile is optional.
+
+   		worker_rlimit_nofile 100000;
+* Test the configuration(always check the nginx config after any change in case the error varies).
+
+   		sudo nginx -t
+* Restart nginx if test passes without Error.
+
+   		sudo systemctl restart nginx
+* Also, keep in mind to check the system limit, if your OS allows for increased number of file descriptor.
+
+   		ulimit -n
+* If necessary, increase the limits by editing /etc/security/limits.conf to allow for more open files:
+   	
+    		*          soft    nofile  100000
+		*          hard    nofile  100000
 
 
 
-3. Nagios Setup on 4th Server:
+8. Nagios Setup on 4th Server:
 Step 3.1: Install the Nagios core on the 4th server(35.94.238.209).
 
 		sudo apt update
