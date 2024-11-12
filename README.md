@@ -19,21 +19,22 @@ Each server has specific roles and configurations, which are documented in the f
 
 1. Web Server Configuration:
 Step 1.1: Install Apache2 and set up Index Pages.
-
 	On Web Server1: 52.42.89.70
-	sudo apt update
-	sudo apt install -y apache2
 
-	#create index.html to serve "a".
-	echo "a" | sudo tee /var/www/html/index.html 
+		sudo apt update
+		sudo apt install -y apache2
+		
+		#create index.html to serve "a".
+		echo "a" | sudo tee /var/www/html/index.html 
 
 
-	Web Server2: 34.222.236.244
-	sudo apt update
-	sudo apt install -y apache2
+	On Web Server2: 34.222.236.244
 
-	#create index.html to serve "b".
-	echo "b" | sudo tee /var/www/html/index.html
+		sudo apt update
+		sudo apt install -y apache2
+	
+		#create index.html to serve "b".
+		echo "b" | sudo tee /var/www/html/index.html
 
 Challenges and Design choices:
 * Web server selection: Apache2 was chosen for simplicity. Also, it is a reliable and widely used web server.
@@ -65,6 +66,7 @@ Challenges and Design choices:
 * Load Balancing Schema: Chose a round-robin with sticky sessions to ensure subsequent requests from the same client are directed to the same web server.
 * Sticky Sessions: Ensured Nginx maintains session persistence so clients are routed to the same web server unless it's down.
 * X-Real-IP Header: Ensured the original IP is passed along to the web servers for logging or any IP-based configuration.
+* However, due to port range 60000-65000 on the load balancer, as existing worker connection was not enough for listening sockets and because of that resource limit was hit. Overcome this issue with modyfying system config.
 
 
 
