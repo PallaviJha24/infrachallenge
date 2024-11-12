@@ -51,8 +51,33 @@ Step 2.2: On 35.93.225.129:
 	sudo apt update
 	sudo apt install -y nginx
 
-Step 2.3: Edit file "/etc/nginx/nginx.conf" to configure upstream configuration and "/etc/nginx/sites-available/default" to include the server block.
-	#Example is present in repo.
+Step 2.3: Edit file "/etc/nginx/nginx.conf" to configure the upstream configuration.
+		
+  		upstream web_servers {
+		    ip_hash;
+		    server xx.xx.xx.xx;  # Web Server 1
+		    server aa.aa.aa.aa;  # Web Server 2
+		}
+
+
+
+And "/etc/nginx/sites-available/default" to include the server block.
+
+	server {
+	        listen 80;
+	        server_name _;
+	        location / {
+	            proxy_pass http://web_servers;
+	            proxy_set_header X-Real-IP $remote_addr;
+	            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	        }
+	
+	        # Port range 60000-65000 forwarding to web servers on port 80
+	        server {
+	            listen 60000-65000;
+	            proxy_pass http://web_servers;
+	        }
+    	}
 
 Step 2.4: Also, you can test and validate NGINX configuration with the below command.
 
